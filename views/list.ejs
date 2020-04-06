@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>To Do List</title>
+
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <header>
+      <h1><%= day %></h1>
+      <!-- <h1>To Do List</h1>
+      <h2>Today is <#%= day %></h2> -->
+    </header>
+    <div class="toDoList">
+      <div class="itemCreator">
+        <form class="formGroup" action="/" method="post">
+          <div class="formItem">
+            <input type="text" name="newItem">
+          </div>
+          <div></div>
+          <div class="formItem">
+            <input type="submit" value="add"> 
+          </div>
+        </form>
+      </div>
+      <div class="list">
+        <ul>
+          <% if (items) { %>
+            <% items.forEach(e => { 
+
+              if(e['isChecked']) {
+                var isChecked = "checked-item";
+                var checked = "checked";
+              }
+
+            %>
+              <li id="item-<%= e['_id'] %>">
+                <form action="/check" method="post">
+                  <input type="hidden" name="hiddenCheckInput" value="<%= e['_id'] %>">
+                  <div class="checkboxSection">
+                    <input type="checkbox" name="checkbox" onchange="this.form.submit()" <%= checked %>>
+                  </div>
+                </form>
+                <span class="<%= isChecked %>"><%= e['name'] %></span>
+                <% if(e['isChecked']) { %>
+                  <form action="/delete" method="post">
+                    <input type="hidden" name="hiddenInput" value="<%= e['_id'] %>">
+                    <button class="closeButton" type="submit" title="Excluir Item">X</button>
+                  </form>
+                <% } %>
+              </li>
+            <% }); %>
+          <% } %>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <span>Designed by Matheus</span>
+  </footer>
+</body>
+
+</html>

@@ -46,16 +46,15 @@ app.get("/:customListaName", function(req, res) {
   List.find({
         name: customListaName
       }, function (err, foundList) {
-        console.log(foundList);
+        // console.log(foundList);
         if(!err) {
           if (foundList.length) {
-            console.log("Existe!");
-
-            res.render("list", {day: foundList[0].name, items: foundList.items});
+            // console.log("Existe!");
+            res.render("list", {day: foundList[0].name, items: foundList[0].foundItems});
 
           } else {
 
-            console.log("Não Existe!");
+            // console.log("Não Existe!");
 
             const list = new List({
               name: customListaName,
@@ -81,6 +80,7 @@ app.get("/job", function (req, res) {
 app.post("/", function(req, res) {
 
   const itemName = req.body.newItem;
+  const listName = req.body.list;
 
   if(itemName.trim() != "") {
 
@@ -89,11 +89,18 @@ app.post("/", function(req, res) {
       isChecked: false
     });
 
-    item.save();
-  
+    if (listName == day) {
+      item.save();
+      res.redirect("/");
+    } else {
+      List.findOne({name: listName}, function(err, foundList) {
+        console.log(foundList);
+        foundList.foundItems.push(item);
+        foundList.save();
+        res.redirect("/" + listName);
+      });
+    }
   }
-
-  res.redirect("/");
 
 });
 

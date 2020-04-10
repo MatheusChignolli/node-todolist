@@ -45,16 +45,18 @@
                 <form action="/check" method="post">
                   <input type="hidden" name="hiddenCheckInput" value="<%= e['_id'] %>">
                   <div class="checkboxSection">
+                    <input type="hidden" name="listName" value="<%= day %>"></input>
                     <input type="checkbox" name="checkbox" onchange="this.form.submit()" <%= checked %>>
                   </div>
                 </form>
                 <span class="<%= isChecked %>"><%= e['name'] %></span>
-                <% if(e['isChecked']) { %>
+                <%# if(e['isChecked']) { %>
                   <form action="/delete" method="post">
-                    <input type="hidden" name="hiddenInput" value="<%= e['_id'] %>">
+                    <input type="hidden" name="hiddenInput" value="<%= e['_id'] %>"></input>
+                    <input type="hidden" name="listName" value="<%= day %>"></input>
                     <button class="closeButton" name="list" type="submit" title="Excluir Item">X</button>
                   </form>
-                <% } %>
+                <%# } %>
               </li>
             <% }); %>
           <% } %>

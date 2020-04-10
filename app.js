@@ -4,6 +4,7 @@ const request = require("request");
 const date = require(__dirname + "/date.js");
 const mongoose = require('mongoose');
 const app = express();
+const _ = require('lodash');
 
 const day = date.getDay();
 
@@ -41,7 +42,7 @@ app.get("/", function(req, res) {
 });
 
 app.get("/:customListaName", function(req, res) {
-  const customListaName = req.params.customListaName;
+  const customListaName = _.capitalize(req.params.customListaName);
   
   List.find({
         name: customListaName
@@ -106,17 +107,44 @@ app.post("/", function(req, res) {
 
 app.post("/delete", function(req, res) {
 
-  if (req.body.hiddenInput) {
+  const checkId = req.body.hiddenInput;
+  const listName = req.body.listName;
 
-    Item.findByIdAndRemove({
-      "_id": req.body.hiddenInput
-    }, function(err) {
-      console.log("Deleted!");
-    });
+  if (listName == day) {
+    if (checkId) {
+
+      Item.findByIdAndRemove({
+        "_id": checkId
+      }, function (err) {
+        console.log("Deleted!");
+      });
+
+    }
+
+    res.redirect("/");
+  } else {
+
+    console.log(checkId);
+
+    if (checkId) {
+
+      List.findOneAndUpdate({
+        name: listName
+      }, {
+        $pull: {
+          foundItems: {
+            _id: checkId
+          }
+        }
+      }, function (err) {
+        console.log("Deleted!");
+      });
+
+    }
+
+    res.redirect("/" + listName);
 
   }
-
-  res.redirect("/");
 
 })
 

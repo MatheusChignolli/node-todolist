@@ -11,7 +11,11 @@ const day = date.getDay();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/todolistDB", {useNewUrlParser: true});
+// Local Database
+// mongoose.connect("mongodb://localhost:27017/todolistDB", {useNewUrlParser: true});
+
+// Atlas MongoDB Database
+mongoose.connect("mongodb+srv://matheuschignolli:ma123456@cluster0-qbelx.mongodb.net/todolistDB", {useNewUrlParser: true});
 
 const itemsSchema = new mongoose.Schema({
   name: String,
@@ -41,35 +45,35 @@ app.get("/", function(req, res) {
 
 });
 
-app.get("/:customListaName", function(req, res) {
-  const customListaName = _.capitalize(req.params.customListaName);
+app.get("/:customListName", function(req, res) {
+  const customListName = _.capitalize(req.params.customListName);
+
+  console.log(req.params);
+
+  console.log(customListName);
   
-  List.find({
-        name: customListaName
-      }, function (err, foundList) {
-        // console.log(foundList);
-        if(!err) {
-          if (foundList.length) {
-            // console.log("Existe!");
-            res.render("list", {day: foundList[0].name, items: foundList[0].foundItems});
+  List.findOne({
+      name: customListName
+    }, function (err, foundList) {
+      // console.log(foundList);
+      if (foundList !== null) {
+        // console.log("Existe!");
+        res.render(`list`, {day: foundList.name, items: foundList.foundItems});
+      } else {
 
-          } else {
+      // console.log("Não Existe!");
 
-            // console.log("Não Existe!");
+      const list = new List({
+        name: customListName,
+        item: []
+      });
 
-            const list = new List({
-              name: customListaName,
-              item: []
-            });
+      list.save();
 
-            list.save();
-
-            res.redirect(`/${customListaName}`);
-          }
-        }
+      res.redirect(`/${customListName}`);
+    }
   });
-
-  
+ 
 });
 
 app.get("/job", function (req, res) {
@@ -83,7 +87,7 @@ app.post("/", function(req, res) {
   const itemName = req.body.newItem;
   const listName = req.body.list;
 
-  if(itemName.trim() != "") {
+  if(itemName.trim() !== "") {
 
     const item = new Item({
       name: itemName,
@@ -102,6 +106,8 @@ app.post("/", function(req, res) {
       });
     }
   }
+
+  res.redirect("/");
 
 });
 
@@ -190,7 +196,13 @@ app.post("/check", function (req, res) {
 
 })
 
-app.listen(3000, function() {
+let port = process.env.PORT;
+
+if(port == null || port == "") {
+  port = 3000;
+}
+
+app.listen(port, function () {
   console.log("Server is ON!");
 })
 
